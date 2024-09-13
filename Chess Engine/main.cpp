@@ -14,10 +14,12 @@ struct SQUARE {
 class ChessBoard {
 public: 															
 	static const int SIZE = 8; 										
-	SQUARE board[SIZE][SIZE];										
+	SQUARE board[SIZE][SIZE];		
+	COLOR turn;
 
 	ChessBoard() {
-		initializeBoard();											
+		initializeBoard();		
+		turn = WHITE;
 	}
 
 	void initializeBoard() {
@@ -71,15 +73,42 @@ public:
 		}
 	}
 
-	/*bool movePiece(some parameters) {
-		true if .moveVaild() ==  true move is made 
-		if false then function closes and move is invalid
-		in this program, we are going to count an invalid move as losing the game, as would be the case 
-		according to FIDE.....
-	}	   */
+	bool movePiece(int startX, int startY, int endX, int endY) {
+		if (isValidMove(startX, startY, endX, endY)) {
+			board[endX][endY] = board[startX][startY];
+			board[startX][startY] = { NONE, NOCOLOR };
+			return true;
+		}
+		else {
+			cout << "INVALID MOVE" << endl;
+			return false;
+		}
 
-	/*bool isValidMove(){
-	figure out this */
+	}	   
+
+	bool isValidMove(int startX, int startY, int endX, int endY) {
+		SQUARE start = board[startX][startX];
+		SQUARE end = board[endX][endX];
+
+		if (start.piece == NONE) { // can't move a piece with no square
+			return false;
+		}
+		if (start.color != turn) {	  // can't move the other color's piece
+			return false;
+		}
+		if (end.color == turn) {   // can't capture your own piece
+			return false;
+		}
+
+		switch (start.piece) {
+		case PAWN:
+			return isValidPawnMove(startX, startY, endX, endY);
+		}
+	}
+
+	bool isValidPawnMove(int startX, int startY, int endX, int endY) {
+		return true;
+	}
 
 };
 
