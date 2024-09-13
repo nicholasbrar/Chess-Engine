@@ -71,6 +71,16 @@ public:
 		}
 	}
 
+	/*bool movePiece(some parameters) {
+		true if .moveVaild() ==  true move is made 
+		if false then function closes and move is invalid
+		in this program, we are going to count an invalid move as losing the game, as would be the case 
+		according to FIDE.....
+	}	   */
+
+	/*bool isValidMove(){
+	figure out this */
+
 };
 
 int main() {
