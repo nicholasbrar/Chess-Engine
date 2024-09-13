@@ -143,7 +143,13 @@ public:
 	}
 
 	bool isValidKnightMove(int startX, int startY, int endX, int endY) {
-		return true;
+		int dx = abs(endX - startX);
+		int dy = abs(endY - startY);
+
+		if(board[endX][endY].color == turn){   // can't capture own piece
+			return false;
+		}
+		return (dx == 1 && dy == 2) || (dx == 2 && dy == 1);
 	}
 
 	bool isValidBishopMove(int startX, int startY, int endX, int endY) {
