@@ -154,19 +154,31 @@ public:
 
 	bool isValidBishopMove(int startX, int startY, int endX, int endY) {
 		return true;
+		// add - can't capture own piece
+		// for diagonal mvoe dx and dy must be the same 
+		// cant go through pieces
+		// check all diagonals
 	}
 
 	bool isValidRookMove(int startX, int startY, int endX, int endY) {
 		return true;
+		// cant capture own piece 
+		// cant move through piece 
+		// dx and dy cant both change 
 	}
 
 	bool isValidQueenMove(int startX, int startY, int endX, int endY) {
 		return true;
+		//valid rook or valid bishop??
 	}
 
 	bool isValidKingMove(int startX, int startY, int endX, int endY) {
 		return true; 
+		// is borderign move
+		// can put self in check for the purposes of this program 
 	}
+
+	// add check logic?? and checkmate
 
 	void getMove(int& startX, int& startY, int& endX, int& endY) {
 		cout << endl << endl << "Enter move(e2 e4) ";
