@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <cmath>
 
 using namespace std;
 
@@ -162,27 +163,22 @@ public:
 	}
 
 	void getMove(int& startX, int& startY, int& endX, int& endY) {
-		cout << endl << endl << "Enter move(e2 e4d) ";
+		cout << endl << endl << "Enter move(e2 e4) ";
 		string move;
 
-		cout << " TEST";
-		
-		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 		getline(cin, move);
-		cout << " move entered   " << move << endl;
 		cout.flush();
 
 		if (move.length() != 5 || move[2] != ' ') {
-			cout << "Invalid move format  !! ";
+			cout << "Invalid move format  !! ";										  
 			return;
 		}
 																				 
 		startY = move[0] - 'a'; 
-		startX = SIZE - (move[1] - '0') ; 
+		startX = (move[1] - '0') - 1;
+
 		endY = move[3] - 'a';   
-		endX = SIZE - (move[4] - '0') ;
-		std::cout << startY << " " << startX << " " << endY << " " << endX << endl;
-		
+		endX = (move[4] - '0') - 1;
 
 	}
 
