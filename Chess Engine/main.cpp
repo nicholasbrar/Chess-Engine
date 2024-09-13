@@ -102,13 +102,106 @@ public:
 
 		switch (start.piece) {
 		case PAWN:
-			return isValidPawnMove(startX, startY, endX, endY);
+			return isValidPawnMove(startX, startY, endX, endY, start.color);
+		case KNIGHT:
+			return isValidKnightMove(startX, startY, endX, endY);
+		case BISHOP:
+			return isValidBishopMove(startX, startY, endX, endY);
+		case ROOK:
+			return isValidRookMove(startX, startY, endX, endY);
+		case QUEEN:
+			return isValidQueenMove(startX, startY, endX, endY);
+		case KING:
+			return isValidKingMove(startX, startY, endX, endY);
 		}
 	}
 
-	bool isValidPawnMove(int startX, int startY, int endX, int endY) {
+	bool isValidPawnMove(int startX, int startY, int endX, int endY, COLOR color) {
+		int direction; 
+
+		if (color == WHITE) {	// white pawn push or black pawn push
+			direction = 1;
+		}
+		else {
+			direction = -1;
+		}
+
+		if (startY == endY && board[endX][endY].piece == NONE) { // vertical pawn push
+			if (endX = startX + direction) {
+				return true;
+			}
+		}
+
+		if ((startX == 1 && color == WHITE || startX == 6 && color == BLACK) && endX == startX + (2 * direction)) {
+			if (board[endX][endY].piece == NONE) {
+				return true;
+			}
+		}
+
+		if (abs(startY - endY) == 1 && endX == startX + direction && board[endX][endY].piece != NONE) {
+			return true;
+		}
+
+	}
+
+	bool isValidKnightMove(int startX, int startY, int endX, int endY) {
 		return true;
 	}
+
+	bool isValidBishopMove(int startX, int startY, int endX, int endY) {
+		return true;
+	}
+
+	bool isValidRookMove(int startX, int startY, int endX, int endY) {
+		return true;
+	}
+
+	bool isValidQueenMove(int startX, int startY, int endX, int endY) {
+		return true;
+	}
+
+	bool isValidKingMove(int startX, int startY, int endX, int endY) {
+		return true; 
+	}
+
+	void getMove(int& startX, int& startY, int& endX, int& endY) {
+		cout << "Enter move (e2 e4) ";
+		string move;
+		cin >> move; 
+
+		//string str = parseMove(move);
+	}
+
+	void playGame() {
+		int startX, startY, endX, endY;
+
+		while (true) {
+			printBoard(); 
+			if (turn == WHITE) {
+				cout << "White's ";
+			}
+			else {
+				cout << "Black's ";
+			}
+			cout << "turn";
+
+			getMove(startX, startY, endX, endY);
+
+			if (movePiece(startX, startY, endX, endY)) {
+				if (turn == WHITE) {
+					turn = BLACK;
+				}
+				else {
+					turn = WHITE;
+				}
+			}
+			else {
+				cout << "Invalid move";
+			}
+		}
+	}
+
+	
 
 };
 
