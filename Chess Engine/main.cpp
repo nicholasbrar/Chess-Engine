@@ -19,6 +19,11 @@ public:
 	SQUARE board[SIZE][SIZE];		
 	COLOR turn;
 
+	bool whiteKingMoved = false;
+	bool blackKingMoved = false;
+	bool whiteRooksMoved[2] = { false, false };
+	bool blackRooksMoved[2] = { false, false };
+	
 	ChessBoard() {
 		initializeBoard();		
 		turn = WHITE; // White always goes first in chess
@@ -75,7 +80,21 @@ public:
 		}
 	}
 
+	bool isValidKingsideCastle(COLOR color) {
+
+	}
+
 	bool movePiece(int startX, int startY, int endX, int endY) {
+		if (startX == -1 && startY == -1 && endX == -1 && endY == -1) {	   //kingside castle
+			if (isValidKingsideCastle(COLOR color)) {
+				// move pieces
+
+			}
+		}
+		else if (startX == -2 && startY == -2 && endX == -2 && endY == -2) {	   //Queenside Castle
+
+		}
+
 		if (isValidMove(startX, startY, endX, endY)) {
 			board[endX][endY] = board[startX][startY];
 			board[startX][startY] = { NONE, NOCOLOR };
@@ -213,6 +232,22 @@ public:
 			}
 
 		}
+		if (turn == WHITE) {
+			if (startX == 0 && startY == 0) {
+				whiteRooksMoved[0] == true; // Queenside White Rook
+			}
+			else if (startX == 0 && startY == 7) {		
+				whiteRooksMoved[1] = true; // Kingside White Rook
+			}
+		}
+		else if (turn == BLACK) {
+			if (startX == 7 && startY == 0) { // Queenside Black Rook
+				blackRooksMoved[0] = true;
+			}
+			else if (startX == 7 && startY == 7) { // Kingside Black Rook
+				blackRooksMoved[1] = true;
+			}
+		}
 		return true;
 	}
 
@@ -229,10 +264,14 @@ public:
 		}
 		
 		if ((dx <= 1 && dy <= 1) && (dx != 0 || dy != 0)) {
+			if (turn == WHITE) {
+				whiteKingMoved = true;
+			}
+			else if (turn == BLACK) {
+				blackKingMoved = true;
+			}
 			return true;
 		}
-
-		// add castling logic
 		return false;
 	}
 
@@ -252,17 +291,18 @@ public:
 		}
 			
 		if (move == "O-O") {   // Kingside Castle
-						  // logic here
+			startX = -1, startY = -1, endX = -1, endY = -1;
+			return;
 		}
 		else if (move == "O-O-O") {
-			// logic here
+			startX = -2, startY = -2, endX = -2, endY = -2;
+			return;
 		}
 		startY = move[0] - 'a'; 
 		startX = (move[1] - '0') - 1;
 
 		endY = move[3] - 'a';   
 		endX = (move[4] - '0') - 1;
-
 	}
 
 
@@ -336,6 +376,7 @@ public:
 		}
 		return false;
 	}
+
 	bool isStalemate(COLOR color) {
 		if (!kingInCheck(color) && !hasLegalMoves(color)) {
 			return true;
