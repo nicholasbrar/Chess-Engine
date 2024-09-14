@@ -179,10 +179,41 @@ public:
 	}
 
 	bool isValidRookMove(int startX, int startY, int endX, int endY) {
+		int dx = abs(startX - endX);
+		int dy = abs(startY - endY);
+
+		if (board[endX][endY].color == turn) { // Can't capture own piece
+			return false;
+		}
+
+		if (dx != 0 && dy != 0) { // Can only move horizontally OR vertically
+			return false;
+		}
+
+		if (dx == 0) { // Vertical rook move
+			int yDirection = (endY > startY) ? 1 : -1;
+			int y = startY + yDirection;
+
+			while (y != endY) {
+				if (board[startX][y].piece != NONE) {
+					return false;
+				}
+				y += yDirection;
+			}
+		}
+		else if (dy == 0) { // Horizontal rook move
+			int xDirection = (endX > startX) ? 1 : -1;
+			int x = startX + xDirection;
+
+			while (x != endX) {
+				if (board[x][startY].piece != NONE) {
+					return false;
+				}
+				x += xDirection;
+			}
+
+		}
 		return true;
-		// cant capture own piece 
-		// cant move through piece 
-		// dx and dy cant both change 
 	}
 
 	bool isValidQueenMove(int startX, int startY, int endX, int endY) {
