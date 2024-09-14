@@ -221,9 +221,19 @@ public:
 	}
 
 	bool isValidKingMove(int startX, int startY, int endX, int endY) {
-		return true; 
-		// is borderign move
-		// can put self in check for the purposes of this program 
+		int dx = abs(endX - startX);
+		int dy = abs(endY - startY);
+
+		if (board[endX][endY].color == turn) {
+			return false;
+		}
+		
+		if ((dx <= 1 && dy <= 1) && (dx != 0 || dx != 0)) {
+			return true;
+		}
+
+		// add castling logic
+		return false;
 	}
 
 
@@ -235,10 +245,18 @@ public:
 		cout.flush();
 
 		if (move.length() != 5 || move[2] != ' ') {
-			cout << "Invalid move format  !! ";										  
-			return;
+			if (move != "O-O" && move != "O-O-O") {
+				cout << "Invalid move format!!";
+				return;
+			}
 		}
-																				 
+			
+		if (move == "O-O") {   // Kingside Castle
+						  // logic here
+		}
+		else if (move == "O-O-O") {
+			// logic here
+		}
 		startY = move[0] - 'a'; 
 		startX = (move[1] - '0') - 1;
 
@@ -274,10 +292,7 @@ public:
 				}
 			}
 		}
-	}
-
-	
-				   
+	}			   
 };
 
 int main() {
