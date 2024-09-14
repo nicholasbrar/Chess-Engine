@@ -21,7 +21,7 @@ public:
 
 	ChessBoard() {
 		initializeBoard();		
-		turn = WHITE;
+		turn = WHITE; // White always goes first in chess
 	}
 
 	void initializeBoard() {
@@ -121,14 +121,14 @@ public:
 	bool isValidPawnMove(int startX, int startY, int endX, int endY, COLOR color) {
 		int direction = (color == WHITE) ? 1 : -1; // push up/down board
 
-		int pawnStart = (color == WHITE) ? 1 : 6; // to check for first move (2 squares)
+		int pawnStart = (color == WHITE) ? 1 : 6; // Takes the value of the starting rank of pawns (1 for White, 6 for Black)
 
-		if (startY == endY && board[endX][endY].piece == NONE) { // vertical pawn push
-			if (endX == startX + direction) {
+		if (startY == endY && board[endX][endY].piece == NONE) { // Ensure pawn isn't moving to a piece occupied square (of either color, that is) 
+			if (endX == startX + direction) { // Move 1 square
 				return true;
 			}
 
-			if (startX == pawnStart && endX == startX + 2 * direction) {
+			if (startX == pawnStart && endX == startX + 2 * direction) { // Moving 2 squares (ensuring its the pawn's first move of the game)
 				if (board[endX][endY].piece == NONE && board[startX + direction][startY].piece == NONE) {
 					return true;
 				}
@@ -136,7 +136,9 @@ public:
 		}
 
 		if (abs(startY - endY) == 1 && endX == startX + direction && board[endX][endY].piece != NONE) {
-			return true;
+			if (board[endX][endY].color != color) {
+				return true;
+			}
 		}
 		return false;
 
@@ -153,11 +155,27 @@ public:
 	}
 
 	bool isValidBishopMove(int startX, int startY, int endX, int endY) {
+		if (board[endX][endY].color == turn) { // Can't capture own piece
+			return false;
+		}
+		if (abs(startX - endX) != abs(startY - endY)) {	// Diagonal movement -- dx must = dy 
+			return false;
+		}
+		
+		int xDirection = (endX > startX) ? 1 : -1;
+		int yDirection = (endY > startY) ? 1 : -1;
+
+		int x = xDirection + startX;
+		int y = yDirection + startY;
+
+		while (x != endX && y != endY) {
+			if (board[x][y].piece != NONE) {
+				return false;
+			}
+			x += xDirection, 
+			y += yDirection;
+		}
 		return true;
-		// add - can't capture own piece
-		// for diagonal mvoe dx and dy must be the same 
-		// cant go through pieces
-		// check all diagonals
 	}
 
 	bool isValidRookMove(int startX, int startY, int endX, int endY) {
@@ -168,8 +186,7 @@ public:
 	}
 
 	bool isValidQueenMove(int startX, int startY, int endX, int endY) {
-		return true;
-		//valid rook or valid bishop??
+		return (isValidRookMove(startX, startY, endX, endY) || isValidBishopMove(startX, startY, endX, endY));
 	}
 
 	bool isValidKingMove(int startX, int startY, int endX, int endY) {
@@ -178,7 +195,6 @@ public:
 		// can put self in check for the purposes of this program 
 	}
 
-	// add check logic?? and checkmate
 
 	void getMove(int& startX, int& startY, int& endX, int& endY) {
 		cout << endl << endl << "Enter move(e2 e4) ";
@@ -207,6 +223,7 @@ public:
 		while (true) {
 			cout << endl;
 			printBoard(); 
+			cout << endl;
 			if (turn == WHITE) {
 				cout << "White's ";
 			}
@@ -229,7 +246,7 @@ public:
 	}
 
 	
-
+				   
 };
 
 int main() {
