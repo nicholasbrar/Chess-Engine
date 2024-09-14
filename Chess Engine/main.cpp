@@ -228,7 +228,7 @@ public:
 			return false;
 		}
 		
-		if ((dx <= 1 && dy <= 1) && (dx != 0 || dx != 0)) {
+		if ((dx <= 1 && dy <= 1) && (dx != 0 || dy != 0)) {
 			return true;
 		}
 
@@ -273,6 +273,7 @@ public:
 			cout << endl;
 			printBoard(); 
 			cout << endl;
+
 			if (turn == WHITE) {
 				cout << "White's ";
 			}
@@ -284,15 +285,70 @@ public:
 			getMove(startX, startY, endX, endY);
 
 			if (movePiece(startX, startY, endX, endY)) {
-				if (turn == WHITE) {
-					turn = BLACK;
-				}
-				else {
-					turn = WHITE;
+				turn = (turn == WHITE) ? BLACK : WHITE;
+			}
+		}
+	}	
+
+	pair<int, int> locateKing(COLOR color) {
+		for (int i = 0; i < SIZE; i++) {
+			for (int j = 0; j < SIZE; j++) {
+				if (board[i][j].piece == KING && board[i][j].color == color) {
+					return { i, j };
 				}
 			}
 		}
-	}			   
+		return { -1, -1 };
+	}
+
+	bool squareIsAttacked(int x, int y, COLOR enemyColor) {
+		for (int i = 0; i < SIZE; i++) {
+			for (int j = 0; j < SIZE; j++) {
+				if (board[i][j].color == enemyColor && board[i][j].piece != NONE) {
+					if (isValidMove(i, j, x, y)) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
+	bool kingInCheck(COLOR color) {
+		pair<int, int> kingLocation = locateKing(color);
+		COLOR enemyColor = (color == WHITE ? BLACK : WHITE); 
+		return(squareIsAttacked(kingLocation.first, kingLocation.second, enemyColor));
+	}
+
+	bool hasLegalMoves(COLOR color) {
+		for (int i = 0; i < SIZE; i++) {					// Checks all possible moves a color can make and determines if any are possible
+			for (int j = 0; j < SIZE; j++) {
+				if (board[i][j].color == color) {
+					for (int x = 0; x < SIZE; x++) {
+						for (int y = 0; y < SIZE; y++) {
+							if (isValidMove(i, j, x, y)) {
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+	bool isStalemate(COLOR color) {
+		if (!kingInCheck(color) && !hasLegalMoves(color)) {
+			return true;
+		}
+		return false;
+	}
+
+	bool isCheckmate(COLOR color) {
+		if (kingInCheck(color) && !hasLegalMoves(color)) {
+			return true;
+		}
+		return false;
+	}
 };
 
 int main() {
