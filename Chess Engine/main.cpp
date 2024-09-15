@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <utility>
 
 using namespace std;
 
@@ -81,13 +82,11 @@ public:
 	}
 
 	bool isValidKingsideCastle(COLOR color) {
-		cout << "ASFDSF";
 		if (color == WHITE) {
 			if (whiteKingMoved || whiteRooksMoved[1]) { // Ensure white king/rook haven't moved
 				return false;
 			}
-			cout << "TEST";
-			if (board[0][5].piece != NONE || board[0][6] != NONE) {
+			if (board[0][5].piece != NONE || board[0][6].piece != NONE) {
 				return false;
 			}
 			if (kingInCheck(WHITE)) {  // Can't castle in check
@@ -112,11 +111,10 @@ public:
 	}
 
 	bool isValidQueensideCastle(COLOR color) {
-
+		return false;
 	}
 
 	bool movePiece(int startX, int startY, int endX, int endY) {
-		cout << "movePiece called with startX=" << startX << ", startY=" << startY << ", endX=" << endX << ", endY=" << endY << endl;
 		if (startX == -1 && startY == -1 && endX == -1 && endY == -1) { // Kingside castle
 			if (isValidKingsideCastle(turn)) {
 				if (turn == WHITE) {
@@ -130,7 +128,10 @@ public:
 				else {
 					blackKingMoved = true;
 					blackRooksMoved[1] = true;
-					// black moves
+					board[7][4] = { NONE, NOCOLOR };
+					board[7][7] = { NONE, NOCOLOR };
+					board[7][5] = { ROOK, BLACK };
+					board[7][6] = { KING, BLACK };
 				}
 				return true;
 			}
@@ -182,7 +183,10 @@ public:
 			return isValidQueenMove(startX, startY, endX, endY);
 		case KING:
 			return isValidKingMove(startX, startY, endX, endY);
+		case NONE:
+			return false;
 		}
+		return false;
 	}
 
 	bool isValidPawnMove(int startX, int startY, int endX, int endY, COLOR color) {
@@ -282,7 +286,7 @@ public:
 		}
 		if (turn == WHITE) {
 			if (startX == 0 && startY == 0) {
-				whiteRooksMoved[0] == true; // Queenside White Rook
+				whiteRooksMoved[0] = true; // Queenside White Rook
 			}
 			else if (startX == 0 && startY == 7) {		
 				whiteRooksMoved[1] = true; // Kingside White Rook
@@ -375,6 +379,7 @@ public:
 			if (movePiece(startX, startY, endX, endY)) {
 				turn = (turn == WHITE) ? BLACK : WHITE;
 			}
+			
 		}
 	}	
 
@@ -390,12 +395,16 @@ public:
 	}
 
 	bool squareIsAttacked(int x, int y, COLOR enemyColor) {
+		bool attacked = false;
 		for (int i = 0; i < SIZE; i++) {
 			for (int j = 0; j < SIZE; j++) {
 				if (board[i][j].color == enemyColor && board[i][j].piece != NONE) {
-					if (isValidMove(i, j, x, y)) {
-						return true;
+					switch (board[i][j].piece) {
+					case BISHOP:
+						if (canBishopAttack(i, j, x, y)) return true;
 					}
+					case KNIGHT:
+						if (canKnightAttack(i, j, x, y)) return true;
 				}
 			}
 		}
@@ -438,9 +447,36 @@ public:
 		}
 		return false;
 	}
+
+	bool canBishopAttack(int startX, int startY, int endX, int endY) {
+		if (abs(startX - endX) != abs(startY - endY)) {	// Diagonal movement -- dx must = dy 
+			return false;
+		}
+
+		int xDirection = (endX > startX) ? 1 : -1;
+		int yDirection = (endY > startY) ? 1 : -1;
+
+		int x = xDirection + startX;
+		int y = yDirection + startY;
+
+		while (x != endX && y != endY) {
+			if (board[x][y].piece != NONE) {
+				return false;
+			}
+			x += xDirection,
+			y += yDirection;
+		}
+		return true;
+	}
+
+	bool canKnightAttack(int startX, int startY, int endX, int endY) {
+
+	}
 };
 
 int main() {
 	ChessBoard board;
 	board.playGame();
+	return 0;
+
 }
