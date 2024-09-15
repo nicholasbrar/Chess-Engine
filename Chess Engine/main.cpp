@@ -81,18 +81,66 @@ public:
 	}
 
 	bool isValidKingsideCastle(COLOR color) {
+		cout << "ASFDSF";
+		if (color == WHITE) {
+			if (whiteKingMoved || whiteRooksMoved[1]) { // Ensure white king/rook haven't moved
+				return false;
+			}
+			cout << "TEST";
+			if (board[0][5].piece != NONE || board[0][6] != NONE) {
+				return false;
+			}
+			if (kingInCheck(WHITE)) {  // Can't castle in check
+				return false;
+			}
+			if (squareIsAttacked(0, 5, BLACK) || squareIsAttacked(0, 6, BLACK)) {
+				return false;
+			}
+			
+			return true;
+		}
+		else if (color == BLACK) {
+			if (blackKingMoved || blackRooksMoved[1]) { // Ensure black king/rook haven't moved
+				return false;
+			}
+			if (kingInCheck(BLACK)) {  // Can't castle in check
+				return false;
+			}
+		}
+		return true;
+		
+	}
+
+	bool isValidQueensideCastle(COLOR color) {
 
 	}
 
 	bool movePiece(int startX, int startY, int endX, int endY) {
-		if (startX == -1 && startY == -1 && endX == -1 && endY == -1) {	   //kingside castle
-			if (isValidKingsideCastle(COLOR color)) {
-				// move pieces
-
+		cout << "movePiece called with startX=" << startX << ", startY=" << startY << ", endX=" << endX << ", endY=" << endY << endl;
+		if (startX == -1 && startY == -1 && endX == -1 && endY == -1) { // Kingside castle
+			if (isValidKingsideCastle(turn)) {
+				if (turn == WHITE) {
+					whiteKingMoved = true;
+					whiteRooksMoved[1] = true;
+					board[0][4] = { NONE,NOCOLOR };
+					board[0][7] = { NONE, NOCOLOR };
+					board[0][5] = { ROOK, WHITE };
+					board[0][6] = { KING, WHITE };
+				}
+				else {
+					blackKingMoved = true;
+					blackRooksMoved[1] = true;
+					// black moves
+				}
+				return true;
 			}
 		}
-		else if (startX == -2 && startY == -2 && endX == -2 && endY == -2) {	   //Queenside Castle
+		else if (startX == -2 && startY == -2 && endX == -2 && endY == -2) { // Queenside Castle
+			if (isValidQueensideCastle(turn)) {
+				// move pieces
 
+		
+			}
 		}
 
 		if (isValidMove(startX, startY, endX, endY)) {
