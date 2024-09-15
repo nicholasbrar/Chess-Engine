@@ -102,7 +102,13 @@ public:
 			if (blackKingMoved || blackRooksMoved[1]) { // Ensure black king/rook haven't moved
 				return false;
 			}
+			if (board[7][5].piece != NONE || board[7][6].piece != NONE) {
+				return false;
+			}
 			if (kingInCheck(BLACK)) {  // Can't castle in check
+				return false;
+			}
+			if (squareIsAttacked(7, 5, WHITE) || squareIsAttacked(7, 6, WHITE)) {
 				return false;
 			}
 		}
@@ -111,7 +117,37 @@ public:
 	}
 
 	bool isValidQueensideCastle(COLOR color) {
-		return false;
+		if (color == WHITE) {
+			if (whiteKingMoved || whiteRooksMoved[0]) { // Ensure white king/rook haven't moved
+				return false;
+			}
+			if (board[0][1].piece != NONE || board[0][2].piece != NONE || board[0][3].piece != NONE) {
+				return false;
+			}
+			if (kingInCheck(WHITE)) {  // Can't castle in check
+				return false;
+			}
+			if (squareIsAttacked(0, 2, BLACK) || squareIsAttacked(0, 3, BLACK)) {
+				return false;
+			}
+
+			return true;
+		}
+		else if (color == BLACK) {
+			if (blackKingMoved || blackRooksMoved[0]) { // Ensure black king/rook haven't moved
+				return false;
+			}
+			if (board[7][1].piece != NONE || board[7][2].piece != NONE || board[7][3].piece != NONE) {
+				return false;
+			}
+			if (kingInCheck(BLACK)) {  // Can't castle in check
+				return false;
+			}
+			if (squareIsAttacked(7, 2, WHITE) || squareIsAttacked(7, 3, WHITE)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	bool movePiece(int startX, int startY, int endX, int endY) {
@@ -138,10 +174,26 @@ public:
 		}
 		else if (startX == -2 && startY == -2 && endX == -2 && endY == -2) { // Queenside Castle
 			if (isValidQueensideCastle(turn)) {
-				// move pieces
+				if (turn == WHITE) {
+					whiteKingMoved = true;
+					whiteRooksMoved[0] = true;
+					board[0][4] = { NONE, NOCOLOR };
+					board[0][0] = { NONE, NOCOLOR };
+					board[0][3] = { ROOK, WHITE };
+					board[0][2] = { KING, WHITE };
+				}
+				else {
+					blackKingMoved = true;
+					blackRooksMoved[0] = true;
+					board[7][4] = { NONE, NOCOLOR };
+					board[7][0] = { NONE, NOCOLOR };
+					board[7][3] = { ROOK, BLACK };
+					board[7][2] = { KING, BLACK };
+				}
 
 		
 			}
+			return true;
 		}
 
 		if (isValidMove(startX, startY, endX, endY)) {
@@ -402,9 +454,23 @@ public:
 					switch (board[i][j].piece) {
 					case BISHOP:
 						if (canBishopAttack(i, j, x, y)) return true;
-					}
+						break;
 					case KNIGHT:
 						if (canKnightAttack(i, j, x, y)) return true;
+						break;
+					case ROOK:
+						if (canRookAttack(i, j, x, y)) return true;
+						break;
+					case PAWN:
+						if (canPawnAttack(i, j, x, y, enemyColor)) return true; 
+						break;
+					case QUEEN:
+						if (canQueenAttack(i, j, x, y)) return true;
+						break;
+					case KING:
+						if (canKingAttack(i, j, x, y)) return true;
+						break;
+					}
 				}
 			}
 		}
@@ -470,7 +536,64 @@ public:
 	}
 
 	bool canKnightAttack(int startX, int startY, int endX, int endY) {
+		int dx = abs(endX - startX);
+		int dy = abs(endY - startY);
 
+		return (dx == 1 && dy == 2) || (dx == 2 && dy == 1);
+	}
+
+	bool canRookAttack(int startX, int startY, int endX, int endY) {
+		int dx = abs(startX - endX);
+		int dy = abs(startY - endY);
+
+		if (dx != 0 && dy != 0) { // Can only move horizontally OR vertically
+			return false;
+		}
+
+		if (dx == 0) { // Vertical rook move
+			int yDirection = (endY > startY) ? 1 : -1;
+			int y = startY + yDirection;
+
+			while (y != endY) {
+				if (board[startX][y].piece != NONE) {
+					return false;
+				}
+				y += yDirection;
+			}
+		}
+		else if (dy == 0) { // Horizontal rook move
+			int xDirection = (endX > startX) ? 1 : -1;
+			int x = startX + xDirection;
+
+			while (x != endX) {
+				if (board[x][startY].piece != NONE) {
+					return false;
+				}
+				x += xDirection;
+			}
+
+		}
+		return true;
+	}
+
+	bool canPawnAttack(int startX, int startY, int endX, int endY, COLOR color) {
+		int direction = (color == WHITE) ? 1 : -1;
+
+		if (abs(startY - endY) == 1 && endX == startX + direction) {
+			return true;
+		}
+		return false;
+	}
+
+	bool canQueenAttack(int startX, int startY, int endX, int endY) {
+		return canRookAttack(startX, startY, endX, endY) || canBishopAttack(startX, startY, endX, endY);
+	}
+
+	bool canKingAttack(int startX, int startY, int endX, int endY) {
+		int dx = abs(startX - endX);
+		int dy = abs(startY - endY);
+
+		return((dx <= 1 && dy <= 1) && (dx != 0 || dy != 0));
 	}
 };
 
