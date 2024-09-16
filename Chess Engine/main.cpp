@@ -199,6 +199,11 @@ public:
 		if (isValidMove(startX, startY, endX, endY)) {
 			board[endX][endY] = board[startX][startY];
 			board[startX][startY] = { NONE, NOCOLOR };
+
+			if ((turn == WHITE && endX == 7 && board[endX][endY].piece == PAWN) || (turn == BLACK && endX == 0 && board[endX][endY].piece == PAWN)) {  // Piece promotion
+				promotePawn(endX, endY);
+			}
+
 			return true;
 		}
 		else {
@@ -207,6 +212,29 @@ public:
 		}
 
 	}	   
+
+	void promotePawn(int x, int y) {
+		char input; 
+		cout << "Choose piece to promote to (Q/B/N/B): ";
+		cin >> input;
+
+		PIECE promotionPiece;
+		switch (input) {
+		case 'Q':
+		case 'q': promotionPiece = QUEEN; break;
+		case 'R':
+		case 'r': promotionPiece = ROOK; break;
+		case 'B':
+		case 'b': promotionPiece = BISHOP; break;
+		case 'N':
+		case 'n': promotionPiece = KNIGHT; break;
+		default:
+			cout << "Invalid choice. Will promote to Queen by default." << endl;
+			promotionPiece = QUEEN;
+		}
+
+		board[x][y].piece = promotionPiece;
+	}
 
 	bool isValidMove(int startX, int startY, int endX, int endY) {
 		SQUARE start = board[startX][startY];
