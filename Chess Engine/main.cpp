@@ -402,6 +402,7 @@ public:
 			startX = -2, startY = -2, endX = -2, endY = -2;
 			return;
 		}
+
 		startY = move[0] - 'a'; 
 		startX = (move[1] - '0') - 1;
 
