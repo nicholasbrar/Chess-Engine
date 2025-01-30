@@ -10,42 +10,42 @@ enum PIECE { PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING, NONE };
 enum COLOR { WHITE, BLACK, NOCOLOR };
 
 struct SQUARE {
-	PIECE piece; 
-	COLOR color; 
+	PIECE piece;
+	COLOR color;
 };
 
 class ChessBoard {
-public: 															
-	static const int SIZE = 8; 										
-	SQUARE board[SIZE][SIZE];		
+public:
+	static const int SIZE = 8;
+	SQUARE board[SIZE][SIZE];
 	COLOR turn;
 
 	bool whiteKingMoved = false;
 	bool blackKingMoved = false;
 	bool whiteRooksMoved[2] = { false, false };
 	bool blackRooksMoved[2] = { false, false };
-	
+
 	ChessBoard() {
-		initializeBoard();		
-		turn = WHITE; // White always goes first in chess
+		initializeBoard();
+		turn = WHITE; //  Initialize as white (always goes first) 
 	}
 
 	void initializeBoard() {
-		for (int i = 0; i < SIZE; i++) {	 // initialize pawns
+		for (int i = 0; i < SIZE; i++) {	 // Initialize pawns
 			board[6][i] = { PAWN, BLACK };
 			board[1][i] = { PAWN, WHITE };
 		}
 
-		board[0][0] = board[0][7] = { ROOK, WHITE }; // initialize rooks
+		board[0][0] = board[0][7] = { ROOK, WHITE }; // Initialize rooks
 		board[7][0] = board[7][7] = { ROOK, BLACK };
 
-		board[0][1] = board[0][6] = { KNIGHT, WHITE }; // initialize knights
+		board[0][1] = board[0][6] = { KNIGHT, WHITE }; // Initialize knights
 		board[7][1] = board[7][6] = { KNIGHT, BLACK };
 
-		board[0][2] = board[0][5] = { BISHOP, WHITE }; // initialize bishops
+		board[0][2] = board[0][5] = { BISHOP, WHITE }; // Initialize bishops
 		board[7][2] = board[7][5] = { BISHOP, BLACK };
 
-		board[0][3] = { QUEEN, WHITE }; // Kings and Queens
+		board[0][3] = { QUEEN, WHITE }; // Initialize kings / queens
 		board[0][4] = { KING, WHITE };
 
 		board[7][3] = { QUEEN, BLACK };
@@ -73,7 +73,7 @@ public:
 	}
 
 	void printBoard() {
-		for (int i = SIZE - 1; i >= 0; i--) {  
+		for (int i = SIZE - 1; i >= 0; i--) {
 			for (int j = 0; j < SIZE; j++) {
 				cout << getPieceCharacter(board[i][j].piece, board[i][j].color) << " ";
 			}
@@ -95,7 +95,7 @@ public:
 			if (squareIsAttacked(0, 5, BLACK) || squareIsAttacked(0, 6, BLACK)) {
 				return false;
 			}
-			
+
 			return true;
 		}
 		else if (color == BLACK) {
@@ -113,7 +113,7 @@ public:
 			}
 		}
 		return true;
-		
+
 	}
 
 	bool isValidQueensideCastle(COLOR color) {
@@ -164,7 +164,7 @@ public:
 				else {
 					blackKingMoved = true;
 					blackRooksMoved[1] = true;
-					board[7][4] = { NONE, NOCOLOR };
+					board[7][4] = { NONE, NOCOLOR };								   // test
 					board[7][7] = { NONE, NOCOLOR };
 					board[7][5] = { ROOK, BLACK };
 					board[7][6] = { KING, BLACK };
@@ -191,12 +191,14 @@ public:
 					board[7][2] = { KING, BLACK };
 				}
 
-		
+
 			}
 			return true;
 		}
 
 		if (isValidMove(startX, startY, endX, endY)) {
+			SQUARE start = board[startX][startY];
+			SQUARE end = board[endX][endY];
 			board[endX][endY] = board[startX][startY];
 			board[startX][startY] = { NONE, NOCOLOR };
 
@@ -211,10 +213,10 @@ public:
 			return false;
 		}
 
-	}	   
+	}
 
 	void promotePawn(int x, int y) {
-		char input; 
+		char input;
 		cout << "Choose piece to promote to (Q/B/N/B): ";
 		cin >> input;
 
@@ -240,33 +242,25 @@ public:
 		SQUARE start = board[startX][startY];
 		SQUARE end = board[endX][endY];
 
-		if (start.piece == NONE) { // can't move a piece with no square
-			return false;
-		}
-		if (start.color != turn) {	  // can't move the other color's piece
-			return false;
-		}
-		if (end.color == turn) {   // can't capture your own piece
-			return false;
-		}
+		if (start.piece == NONE) return false; // Can't move a nonexistent piece
+		if (start.color != turn) return false; // Can't move other color's piece
+		if (end.color == turn) return false; // Can't capture your own piece
+
+		bool valid = false;
 
 		switch (start.piece) {
-		case PAWN:
-			return isValidPawnMove(startX, startY, endX, endY, start.color);
-		case KNIGHT:
-			return isValidKnightMove(startX, startY, endX, endY);
-		case BISHOP:
-			return isValidBishopMove(startX, startY, endX, endY);
-		case ROOK:
-			return isValidRookMove(startX, startY, endX, endY);
-		case QUEEN:
-			return isValidQueenMove(startX, startY, endX, endY);
-		case KING:
-			return isValidKingMove(startX, startY, endX, endY);
-		case NONE:
-			return false;
+		case PAWN: valid = isValidPawnMove(startX, startY, endX, endY, start.color); break;
+		case KNIGHT: valid = isValidKnightMove(startX, startY, endX, endY); break;
+		case BISHOP: valid = isValidBishopMove(startX, startY, endX, endY);	break;
+		case ROOK: valid = isValidRookMove(startX, startY, endX, endY); break;
+		case QUEEN: valid = isValidQueenMove(startX, startY, endX, endY); break;
+		case KING: valid = isValidKingMove(startX, startY, endX, endY); break;
+		default: return false;
 		}
-		return false;
+
+		if (!valid) return false;
+
+		return !moveLeavesKingInCheck(startX, startY, endX, endY);
 	}
 
 	bool isValidPawnMove(int startX, int startY, int endX, int endY, COLOR color) {
@@ -299,7 +293,7 @@ public:
 		int dx = abs(endX - startX);
 		int dy = abs(endY - startY);
 
-		if(board[endX][endY].color == turn){   // can't capture own piece
+		if (board[endX][endY].color == turn) {   // can't capture own piece
 			return false;
 		}
 		return (dx == 1 && dy == 2) || (dx == 2 && dy == 1);
@@ -312,7 +306,7 @@ public:
 		if (abs(startX - endX) != abs(startY - endY)) {	// Diagonal movement -- dx must = dy 
 			return false;
 		}
-		
+
 		int xDirection = (endX > startX) ? 1 : -1;
 		int yDirection = (endY > startY) ? 1 : -1;
 
@@ -323,8 +317,8 @@ public:
 			if (board[x][y].piece != NONE) {
 				return false;
 			}
-			x += xDirection, 
-			y += yDirection;
+			x += xDirection,
+				y += yDirection;
 		}
 		return true;
 	}
@@ -368,7 +362,7 @@ public:
 			if (startX == 0 && startY == 0) {
 				whiteRooksMoved[0] = true; // Queenside White Rook
 			}
-			else if (startX == 0 && startY == 7) {		
+			else if (startX == 0 && startY == 7) {
 				whiteRooksMoved[1] = true; // Kingside White Rook
 			}
 		}
@@ -394,7 +388,7 @@ public:
 		if (board[endX][endY].color == turn) {
 			return false;
 		}
-		
+
 		if ((dx <= 1 && dy <= 1) && (dx != 0 || dy != 0)) {
 			if (turn == WHITE) {
 				whiteKingMoved = true;
@@ -421,7 +415,7 @@ public:
 				return;
 			}
 		}
-			
+
 		if (move == "O-O") {   // Kingside Castle
 			startX = -1, startY = -1, endX = -1, endY = -1;
 			return;
@@ -431,43 +425,49 @@ public:
 			return;
 		}
 
-		startY = move[0] - 'a'; 
+		startY = move[0] - 'a';
 		startX = (move[1] - '0') - 1;
 
-		endY = move[3] - 'a';   
+		endY = move[3] - 'a';
 		endX = (move[4] - '0') - 1;
 	}
 
 
 	void playGame() {
-		int startX, startY, endX, endY;
-
 		while (true) {
 			cout << endl;
-			printBoard(); 
-			cout << endl;
+			printBoard();
 
-			if (turn == WHITE) {
-				cout << "White's ";
-			}
-			else {
-				cout << "Black's ";
-			}
-			cout << "turn";
+			COLOR currentPlayer = turn;
 
+			if (kingInCheck(currentPlayer)) {
+				if (isCheckmate(currentPlayer)) {
+					cout << "Checkmate " << (currentPlayer == WHITE ? "Black" : "White") << " wins!" << endl;
+					break;
+				}
+				else {
+					cout << (currentPlayer == WHITE ? " -- White" : " -- Black") << " is in check" << endl;
+				}
+			}
+			else if (isStalemate(currentPlayer)) {
+				cout << "Draw by stalemate" << endl;
+			}
+
+			cout << endl << (turn == WHITE ? "White's turn" : "Black's turn");
+			int startX, startY, endX, endY;
 			getMove(startX, startY, endX, endY);
 
 			if (movePiece(startX, startY, endX, endY)) {
 				turn = (turn == WHITE) ? BLACK : WHITE;
 			}
-			
-		}
-	}	
 
-	pair<int, int> locateKing(COLOR color) {
+		}
+	}
+
+	pair<int, int> locateKing(COLOR color, const SQUARE(&tempBoard)[SIZE][SIZE]) {
 		for (int i = 0; i < SIZE; i++) {
 			for (int j = 0; j < SIZE; j++) {
-				if (board[i][j].piece == KING && board[i][j].color == color) {
+				if (tempBoard[i][j].piece == KING && tempBoard[i][j].color == color) {
 					return { i, j };
 				}
 			}
@@ -475,12 +475,16 @@ public:
 		return { -1, -1 };
 	}
 
-	bool squareIsAttacked(int x, int y, COLOR enemyColor) {
+	pair<int, int> locateKing(COLOR color) {
+		return locateKing(color, board);
+	}
+
+	bool squareIsAttacked(int x, int y, COLOR enemyColor, const SQUARE(&tempBoard)[SIZE][SIZE]) {
 		bool attacked = false;
 		for (int i = 0; i < SIZE; i++) {
 			for (int j = 0; j < SIZE; j++) {
-				if (board[i][j].color == enemyColor && board[i][j].piece != NONE) {
-					switch (board[i][j].piece) {
+				if (tempBoard[i][j].color == enemyColor && tempBoard[i][j].piece != NONE) {
+					switch (tempBoard[i][j].piece) {
 					case BISHOP:
 						if (canBishopAttack(i, j, x, y)) return true;
 						break;
@@ -491,7 +495,7 @@ public:
 						if (canRookAttack(i, j, x, y)) return true;
 						break;
 					case PAWN:
-						if (canPawnAttack(i, j, x, y, enemyColor)) return true; 
+						if (canPawnAttack(i, j, x, y, enemyColor)) return true;
 						break;
 					case QUEEN:
 						if (canQueenAttack(i, j, x, y)) return true;
@@ -499,17 +503,44 @@ public:
 					case KING:
 						if (canKingAttack(i, j, x, y)) return true;
 						break;
+					default: break;
 					}
 				}
 			}
 		}
 		return false;
 	}
-	
+
+	bool squareIsAttacked(int x, int y, COLOR enemyColor) {
+		return squareIsAttacked(x, y, enemyColor, board);
+	}
+
 	bool kingInCheck(COLOR color) {
 		pair<int, int> kingLocation = locateKing(color);
-		COLOR enemyColor = (color == WHITE ? BLACK : WHITE); 
+		COLOR enemyColor = (color == WHITE ? BLACK : WHITE);
 		return(squareIsAttacked(kingLocation.first, kingLocation.second, enemyColor));
+	}
+
+	bool moveLeavesKingInCheck(int startX, int startY, int endX, int endY) {
+		SQUARE tempBoard[SIZE][SIZE];
+		memcpy(tempBoard, board, sizeof(SQUARE) * SIZE * SIZE);
+
+		SQUARE startPiece = tempBoard[startX][startY];
+		tempBoard[startX][startY] = { NONE, NOCOLOR };
+		tempBoard[endX][endY] = startPiece;
+
+		COLOR currentColor = turn;
+		pair<int, int> kingLocation;
+
+		if (startPiece.piece == KING && startPiece.color == currentColor) {
+			kingLocation = { endX, endY };
+		}
+		else {
+			kingLocation = locateKing(currentColor, tempBoard);
+		}
+
+		COLOR enemyColor = (currentColor == WHITE) ? BLACK : WHITE;
+		return squareIsAttacked(kingLocation.first, kingLocation.second, enemyColor, tempBoard);
 	}
 
 	bool hasLegalMoves(COLOR color) {
@@ -530,17 +561,11 @@ public:
 	}
 
 	bool isStalemate(COLOR color) {
-		if (!kingInCheck(color) && !hasLegalMoves(color)) {
-			return true;
-		}
-		return false;
+		return !kingInCheck(color) && !hasLegalMoves(color);
 	}
 
 	bool isCheckmate(COLOR color) {
-		if (kingInCheck(color) && !hasLegalMoves(color)) {
-			return true;
-		}
-		return false;
+		return kingInCheck(color) && !hasLegalMoves(color);
 	}
 
 	bool canBishopAttack(int startX, int startY, int endX, int endY) {
@@ -559,7 +584,7 @@ public:
 				return false;
 			}
 			x += xDirection,
-			y += yDirection;
+				y += yDirection;
 		}
 		return true;
 	}
@@ -630,5 +655,4 @@ int main() {
 	ChessBoard board;
 	board.playGame();
 	return 0;
-
 }
