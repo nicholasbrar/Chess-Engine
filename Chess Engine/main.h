@@ -22,13 +22,13 @@ struct SQUARE {
 class ChessBoard {
 public: 
     static const int SIZE = 8;
-	SQUARE board[SIZE][SIZE];
-	COLOR turn;
-
-	bool whiteKingMoved = false;
-	bool blackKingMoved = false;
-	bool whiteRooksMoved[2] = { false, false };
-	bool blackRooksMoved[2] = { false, false };
+    SQUARE board[SIZE][SIZE];
+    COLOR turn;
+    
+    bool whiteKingMoved = false;
+    bool blackKingMoved = false;
+    bool whiteRooksMoved[2] = { false, false };
+    bool blackRooksMoved[2] = { false, false };
 
 	ChessBoard();
 	void initializeBoard();
