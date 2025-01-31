@@ -21,7 +21,7 @@ struct SQUARE {
 
 class ChessBoard {
 public: 
-	static const int SIZE = 8;
+    static const int SIZE = 8;
 	SQUARE board[SIZE][SIZE];
 	COLOR turn;
 
