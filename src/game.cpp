@@ -1,4 +1,4 @@
-#include "main.h"
+#include "game.h"
 
 using namespace std;
 
@@ -8,23 +8,29 @@ ChessBoard::ChessBoard() {
 }
 
 void ChessBoard::initializeBoard() {
-	for (int i = 0; i < SIZE; i++) {	 // Initialize pawns
+    // Pawns
+	for (int i = 0; i < SIZE; i++) {	 
 		board[6][i] = { PAWN, BLACK };
 		board[1][i] = { PAWN, WHITE };
 	}
 
-	board[0][0] = board[0][7] = { ROOK, WHITE }; // Initialize rooks
+    // Rooks
+	board[0][0] = board[0][7] = { ROOK, WHITE }; 
 	board[7][0] = board[7][7] = { ROOK, BLACK };
 
-	board[0][1] = board[0][6] = { KNIGHT, WHITE }; // Initialize knights
+    // Knights
+	board[0][1] = board[0][6] = { KNIGHT, WHITE }; 
 	board[7][1] = board[7][6] = { KNIGHT, BLACK };
 
-	board[0][2] = board[0][5] = { BISHOP, WHITE }; // Initialize bishops
+    // Bishops
+	board[0][2] = board[0][5] = { BISHOP, WHITE }; 
 	board[7][2] = board[7][5] = { BISHOP, BLACK };
 
-	board[0][3] = { QUEEN, WHITE }; // Initialize kings / queens
+    // White King/Queen
+	board[0][3] = { QUEEN, WHITE }; 
 	board[0][4] = { KING, WHITE };
 
+    // Black King/Queen
 	board[7][3] = { QUEEN, BLACK };
 	board[7][4] = { KING, BLACK };
 
@@ -46,6 +52,7 @@ char ChessBoard::getPieceCharacter(PIECE piece, COLOR color) {
 	case QUEEN: return color == WHITE ? 'Q' : 'q';
 	case KING: return color == WHITE ? 'K' : 'k';
 	case NONE: return '.';
+	default: return '.';
 	}
 }
 
@@ -638,5 +645,4 @@ int main() {
 	ChessBoard board;
 	board.playGame();
 	return 0;
-
 }
